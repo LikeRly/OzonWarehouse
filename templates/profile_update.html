@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+  <!-- Inline-styles for centered “Сохранить” button -->
+  <style>
+    .profile-update-btn {
+      width: 100%;
+      margin: 1rem 0 0;
+      font-size: 1.11rem;
+      padding: .81rem 0;
+      border-radius: 2.2rem;
+      background: linear-gradient(90deg, #213160 0%, #a87afe 100%);
+      border: none;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: .03em;
+      box-shadow: 0 2px 14px 0 #FFD60033, 0 1px 4px #21316019;
+      transition: filter .18s, transform .16s;
+      cursor: pointer;
+    }
+    .profile-update-btn:hover {
+      filter: brightness(1.09) drop-shadow(0 3px 10px #FFD60050);
+      transform: translateY(-2px) scale(1.022);
+    }
+    /* Dark mode override */
+    body.dark .profile-update-btn {
+      background: linear-gradient(95deg, #726bff 0%, #e14bff 100%) !important;
+      box-shadow: 0 0 0 0 #fff, 0 10px 32px rgba(114,107,255,0.15);
+    }
+  </style>
+
+  <div class="container-fluid py-4">
+    <div class="row justify-content-center">
+      <div class="col-lg-6 col-md-8 col-12">
+        <div class="card shadow-sm rounded-4 p-4" style="max-width:520px; margin:0 auto;">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <img
+              src="{% if request.user.profile.avatar %}{{ request.user.profile.avatar.url }}{% else %}{% static 'avatars/default.png' %}{% endif %}"
+              alt="Аватар"
+              class="rounded-circle border"
+              style="width:52px; height:52px; object-fit:cover;"
+            >
+            <div>
+              <h5 class="mb-1 fw-semibold">Редактировать профиль</h5>
+              <div class="small text-muted">{{ request.user.username }}</div>
+            </div>
+          </div>
+
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="id_username" class="form-label">Имя пользователя</label>
+              <input
+                type="text"
+                class="form-control"
+                id="id_username"
+                name="username"
+                value="{{ user_form.username.value|default:request.user.username }}"
+                maxlength="150"
+                required
+                autocomplete="off"
+              >
+            </div>
+
+            <div class="mb-2 small text-muted">
+              Текущий аватар:
+              {% if request.user.profile.avatar %}
+                <span class="text-primary">{{ request.user.profile.avatar.name }}</span>
+              {% else %}
+                <span class="text-warning">по умолчанию</span>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label for="id_avatar" class="form-label">Сменить аватар</label>
+              <input
+                type="file"
+                class="form-control"
+                id="id_avatar"
+                name="avatar"
+                accept="image/png,image/jpeg"
+              >
+            </div>
+              <div class="text-center">
+                  <button type="submit"
+                          class="btn-gradient"
+                          style="width:100%; font-size:1.11rem; padding:.81rem 0; border-radius:2.2rem;
+                          background:linear-gradient(90deg,#213160 0%,#a87afe 100%); margin-top:10px;">
+                      Сохранить
+                  </button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

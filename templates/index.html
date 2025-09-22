@@ -1,0 +1,17 @@
+{# templates/index.html #}
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Товары / Склад — Ozon Склад{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Заголовок и кнопки быстрого доступа -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Товары / Склад</h1>
+  </div>
+
+  <!-- Таблица товаров -->
+  {% include "partials/products_table.html" %}
+</div>
+{% endblock %}

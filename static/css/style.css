@@ -1,0 +1,498 @@
+/* 1. :root — переменные (консолидированные) */
+:root {
+  /* Цвета */
+  --c-primary:       #726bff;
+  --c-secondary:     #e14bff;
+  --c-accent:        #53e2fe;
+  --c-success:       #00e097;
+  --c-danger:        #ff5d85;
+  --c-bg-main:       #f6f8ff;
+  --c-bg-glass:      rgba(255,255,255,0.82);
+  --c-bg-glass-dark: rgba(38, 41, 68, 0.86);
+  --c-surface:       #ffffff;
+  --c-border:        #e6e9f8;
+  --c-muted:         #8d98b7;
+  --c-text:          #232c3b;
+  --c-dark:          #21223a;
+
+  /* Радиусы и тени */
+  --radius-xl:       2rem;
+  --radius-lg:       1.4rem;
+  --radius:          1rem;
+  --radius-sm:       0.7rem;
+  --shadow-glass:    0 8px 36px 0 rgba(114,107,255,0.14),0 2.5px 10px 0 rgba(38,41,68,0.06);
+  --shadow-glow:     0 0 8px 1.5px #726bff55,0 10px 32px 0 #c1b6ff22;
+  --shadow-card:     0 4px 18px 0 rgba(114,107,255,0.09),0 1.5px 6px 0 rgba(44,54,100,0.06);
+
+  /* Транзишны и z-index */
+  --transition:      all .24s cubic-bezier(.52,.2,.37,1.14);
+  --z-modal:         2000;
+  --z-sticky:        1100;
+}
+
+/* 2. Reset + типографика */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+html {
+  font-size: 16px;
+  font-family: 'Inter','Segoe UI',Arial,sans-serif;
+  background: var(--c-bg-main);
+  color: var(--c-text);
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(110deg,#e6e9ff 0%,#f6f8ff 70%);
+  overflow-x: hidden;
+  position: relative;
+}
+::-webkit-scrollbar { width:8px; height:8px; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg,#e4eafd 40%,#baacf1 100%);
+  border-radius: 8px;
+}
+
+/* 3. Фоновые декоративные пятна */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity .35s;
+}
+body::before {
+  top: -130px; right: -140px;
+  width: 520px; height: 420px;
+  background: radial-gradient(ellipse at 60% 30%,#a0c3ff88 0%,#f7e0ff00 90%);
+  filter: blur(12px);
+  opacity: .6;
+}
+body::after {
+  left: -130px; bottom: -90px;
+  width: 440px; height: 380px;
+  background: radial-gradient(ellipse at 10% 90%,#fca2ff55 0%,#f7e0ff00 90%);
+  filter: blur(15px);
+  opacity: .38;
+}
+
+/* 4. Sidebar */
+.sidebar {
+  width: 240px;
+  min-width: 190px;
+  background: linear-gradient(156deg,#f7f9ff 50%,#f7e9ff 100%);
+  border-right:1.5px solid #e0e7f5;
+  display:flex;
+  flex-direction:column;
+  padding:2.2rem 0 1rem;
+  position:relative;
+  z-index:var(--z-sticky);
+  box-shadow:2px 0 36px 0 #c1b6ff13;
+  animation: slideInLeft .5s both;
+}
+.sidebar-header {
+  text-align:center;
+  margin-bottom:2.2rem;
+  font-weight:900;
+  font-size:1.37rem;
+  letter-spacing:.05em;
+  color:#726bff;
+  text-shadow:0 2px 8px #d8d1ff80;
+  user-select:none;
+}
+.sidebar .nav-link {
+  display:flex;
+  align-items:center;
+  gap:.73em;
+  font-size:1.13rem;
+  padding:1.08rem 2.1rem;
+  border-radius:1.45rem 1rem 1rem 1.45rem;
+  color:#5c6686;
+  margin:0 0 0.14rem .2rem;
+  font-weight:600;
+  transition:var(--transition);
+  position:relative;
+}
+.sidebar .nav-link .bi { font-size:1.23em; color:#b3b6f5; }
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+  background:linear-gradient(100deg,#726bff 0%,#e14bff 99%);
+  color:#fff!important;
+  box-shadow:0 0 0 4px #d1cfff44;
+  text-shadow:0 2px 10px #fff3;
+}
+.sidebar .nav-link.active .bi,
+.sidebar .nav-link:hover .bi { color:#fff; }
+.sidebar-footer {
+  margin-top:auto;
+  text-align:center;
+  font-size:1.01rem;
+  color:#c1cbe8;
+  opacity:.88;
+  padding:2.2rem 0 .7rem;
+}
+
+/* 5. Topbar */
+.topbar-navbar {
+  min-height:67px;
+  background:rgba(255,255,255,0.93);
+  backdrop-filter:blur(12px);
+  border-bottom:1.5px solid #e5e8ef;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 2.1rem;
+  box-shadow:0 6px 32px 0 rgba(130,160,255,0.10);
+  color:var(--c-text);
+  position:sticky;
+  top:0;
+  z-index:var(--z-sticky);
+  animation: fadeInUp .55s both;
+  font-weight:700;
+  font-size:1.11rem;
+}
+
+/* 6. Content wrapper */
+.content, .container-fluid {
+  flex-grow:1;
+  padding:0.75rem 1.4rem 1.6rem 0.6rem !important;
+  overflow:auto;
+  max-width:100%;
+}
+
+/* 7. Cards & glass effect */
+.card, .modal-content, .table {
+  background:var(--c-bg-glass);
+  backdrop-filter: blur(17px) saturate(140%);
+  border-radius:var(--radius-xl);
+  border:1.4px solid #e6e9f877;
+  box-shadow:var(--shadow-glass);
+  animation: fadeInUp .52s both;
+}
+
+/* 8. Tables */
+.table {
+  overflow:hidden;
+  border-collapse: separate;
+  border-spacing:0;
+}
+.table thead th {
+  position:sticky; top:0;
+  background:rgba(255,255,255,0.90);
+  z-index:2;
+  border-bottom:1.5px solid #e7e9fa;
+  font-weight:700;
+  font-size:1.04rem;
+  padding:1.03rem .7rem;
+  letter-spacing:.03em;
+  color:#8a98bf;
+  backdrop-filter: blur(10px);
+}
+.table tbody td {
+  font-size:1.11rem;
+  padding:.8rem .8rem;
+  color:#3b4361;
+  font-weight:500;
+  vertical-align:middle;
+  background:transparent;
+  border:none;
+}
+.table tbody tr { transition:background .15s; }
+.table tbody tr:hover {
+  background: linear-gradient(100deg,#a1f8ff10 0%,#f5e9ff13 100%);
+}
+
+/* 9. Action-toolbar buttons */
+.action-toolbar {
+  display:flex;
+  gap:.62rem;
+}
+
+/* === Исправление: одинаковый размер кнопок “Ред.” и “Удалить” === */
+.table tbody td:last-child .btn {
+  min-width: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .62rem 1rem !important;
+}
+
+/* 10. Общие градиентные кнопки */
+.btn-gradient,
+.btn-gradient-edit,
+.btn-gradient-danger,
+.add-btn-float {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.13rem!important;
+  border-radius:2.1rem!important;
+  padding:.62rem 2.1rem!important;
+  font-weight:700;
+  letter-spacing:.01em;
+  color:#fff!important;
+  box-shadow:var(--shadow-glow);
+  transition: filter .16s,box-shadow .21s,transform .13s;
+  cursor:pointer;
+  border:none;
+  outline:none;
+  position:relative;
+  z-index:1;
+}
+.btn-gradient { background:linear-gradient(90deg,#726bff 10%,#e14bff 100%)!important; }
+.btn-gradient-edit { background:linear-gradient(94deg,#53e2fe 0%,#726bff 100%)!important; }
+.btn-gradient-danger { background:linear-gradient(90deg,#ff5d85 10%,#726bff 95%)!important; }
+.btn-gradient:active,
+.btn-gradient-edit:active,
+.btn-gradient-danger:active {
+  filter:brightness(.96);
+  transform:scale(.97);
+}
+.btn-gradient:hover,
+.btn-gradient-edit:hover,
+.btn-gradient-danger:hover,
+.add-btn-float:hover {
+  filter:brightness(1.12) saturate(1.12);
+  box-shadow:0 0 0 5px #b8a0fc33,0 16px 36px 0 #a780fa35;
+  transform:translateY(-2px) scale(1.03);
+}
+.add-btn-float {
+  margin-top:2.1rem;
+  float:right;
+  background:linear-gradient(90deg,#726bff 10%,#53e2fe 100%)!important;
+}
+
+/* 11. Forms & inputs */
+.form-control {
+  border-radius:var(--radius);
+  padding:1.03rem 1.12rem;
+  background:#f7f9fc;
+  border:1.5px solid #e1e7f4;
+  color:var(--c-text);
+  font-size:1.08rem;
+  margin-bottom:8px;
+  font-weight:500;
+  transition:border-color .17s;
+}
+.form-control:focus {
+  border-color:var(--c-primary);
+  box-shadow:0 0 0 1.5px var(--c-accent);
+  outline:none;
+}
+::placeholder { color:#a0a5b9; }
+body.dark ::placeholder { color:#888cae; }
+
+/* 12. Modals */
+.modal-content {
+  padding:.6rem .6rem .5rem;
+  border:none;
+}
+.modal-header,
+.modal-footer {
+  background:transparent;
+  border:none;
+  padding:.5rem 1rem;
+}
+.modal-title {
+  font-weight:700;
+  font-size:1.15rem;
+  color:#595dc1;
+}
+.modal-footer {
+  display:flex;
+  justify-content:flex-end;
+  gap:.9rem;
+}
+
+/* 13. Таблица: выравнивание последнего столбца */
+.table thead th:last-child {
+  width: 12%;
+  text-align: center;
+}
+.table tbody td:last-child {
+  padding: 0.6rem;
+}
+
+/* 14. Dark mode overrides */
+body.dark {
+  background: linear-gradient(120deg, #202246 0%, #271930 100%) !important;
+  color: #e7eaf5 !important;
+}
+body.dark .sidebar {
+  background: linear-gradient(150deg, #19193b 60%, #292152 100%);
+  box-shadow: 2px 0 36px 0 #726bff12;
+}
+body.dark .table,
+body.dark .table-responsive {
+  background: rgba(255,255,255,0.12) !important;
+}
+body.dark .table thead th {
+  background: rgba(40,41,65,0.92);
+  color: #b5bcff;
+}
+body.dark .table tbody td {
+  background: transparent;
+  color: #e7eaf5;
+}
+body.dark .card,
+body.dark .modal-content {
+  background: var(--c-bg-glass-dark) !important;
+  border-color: #31356a !important;
+  color: #e7eaf5 !important;
+}
+body.dark .form-control {
+  background: #222338 !important;
+  color: #dbe2fd !important;
+  border-color: #31356a !important;
+}
+
+/* 15. Animations */
+@keyframes fadeInUp {
+  from {opacity:0;transform:translateY(22px) scale(.98);}
+  to   {opacity:1;transform:translateY(0) scale(1);}
+}
+@keyframes slideInLeft {
+  from {opacity:0;transform:translateX(-34px);}
+  to   {opacity:1;transform:translateX(0);}
+}
+
+/* 16. Dark-mode: исправление для смены пароля */
+body.dark .password-card {
+  background: var(--c-bg-glass-dark) !important;
+  border: 1px solid #31356a !important;
+  color: #e7eaf5;
+}
+body.dark .password-card .input-label {
+  color: #a0a8c2 !important;
+}
+body.dark .password-card .form-control {
+  background: #222338 !important;
+  color: #e7eaf5 !important;
+  border-color: #31356a !important;
+}
+body.dark .password-card .form-control::placeholder {
+  color: #b5bbc9 !important;
+}
+body.dark .password-card .text-center > .btn-gradient {
+  background: linear-gradient(95deg, #726bff 0%, #e14bff 100%) !important;
+  box-shadow: 0 4px 20px rgba(114,107,255,0.25) !important;
+  color: #fff !important;
+}
+
+#transactionsSearchForm .input-group {
+    border-radius: 14px;
+    background: #f9fafd;
+    border: none;
+    box-shadow: 0 4px 24px 0 rgba(120,130,220,0.10), 0 0 0 2px #e0e8fa;
+    transition: box-shadow .22s, background .18s;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+#transactionsSearchForm .input-group:focus-within {
+    background: #f4f7ff;
+    box-shadow: 0 6px 28px 0 rgba(120,130,220,0.13), 0 0 0 3px #9ec9fd;
+}
+
+#transactionsSearchForm .input-group-text {
+    background: transparent;
+    border: none;
+    color: #97a3bb;
+    font-size: 21px;
+    padding: 0 15px 0 18px;
+    transition: color .18s;
+    height: 45px;
+    display: flex;
+    align-items: center;
+}
+
+#transactionsSearchForm .form-control {
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    color: #32354a;
+    padding: 13px 18px 13px 0;
+    min-width: 340px;
+    box-shadow: none !important;
+    outline: none;
+    border-radius: 0;
+    transition: background .18s, color .15s;
+}
+
+#transactionsSearchForm .form-control::placeholder {
+    color: #b3bedc;
+    font-size: 17px;
+    opacity: 1;
+    letter-spacing: 0.02em;
+}
+
+#transactionsSearchForm .form-control:focus {
+    background: #f2f6ff;
+    color: #262d45;
+}
+
+#transactionsSearchForm .form-control:focus-visible {
+    outline: none;
+}
+
+body.dark #transactionsSearchForm .input-group {
+    border-radius: 14px;
+    background: linear-gradient(90deg, #20203a 60%, #272040 100%);
+    border: none;
+    box-shadow: 0 4px 22px 0 rgba(70,60,130,0.22), 0 0 0 2px #32324b;
+    transition: box-shadow .22s, background .18s;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+body.dark #transactionsSearchForm .input-group:focus-within {
+    background: linear-gradient(90deg, #26243e 70%, #322a5d 100%);
+    box-shadow: 0 8px 28px 0 rgba(90,100,220,0.14), 0 0 0 3px #7fd6ff;
+}
+
+body.dark #transactionsSearchForm .input-group-text {
+    background: transparent;
+    border: none;
+    color: #93a2c6;
+    font-size: 21px;
+    padding: 0 15px 0 18px;
+    transition: color .18s;
+    height: 45px;
+    display: flex;
+    align-items: center;
+}
+
+body.dark #transactionsSearchForm .form-control {
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    color: #eaf3fc;
+    padding: 13px 18px 13px 0;
+    min-width: 340px;
+    box-shadow: none !important;
+    outline: none;
+    border-radius: 0;
+    transition: background .18s, color .15s;
+}
+
+body.dark #transactionsSearchForm .form-control::placeholder {
+    color: #7c8da4;
+    font-size: 17px;
+    opacity: 1;
+    letter-spacing: 0.02em;
+}
+
+body.dark #transactionsSearchForm .form-control:focus {
+    background: #202a3a;
+    color: #fff;
+}
+
+body.dark #transactionsSearchForm .form-control:focus-visible {
+    outline: none;
+}

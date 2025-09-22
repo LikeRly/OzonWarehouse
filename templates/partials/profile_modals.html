@@ -1,0 +1,111 @@
+{% load static %}
+
+<!-- profile_modals.html -->
+<!-- Модалка профиля -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="{% url 'update_profile' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="profileModalLabel">Профиль пользователя</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="text-center mb-3">
+            {% if request.user.is_authenticated and request.user.avatar %}
+              <img
+                src="{{ request.user.avatar.url }}"
+                alt="Аватар"
+                class="rounded-circle"
+                width="100"
+                height="100"
+              >
+            {% else %}
+              <img
+                src="{% static 'avatars/default.png' %}"
+                alt="Аватар по умолчанию"
+                class="rounded-circle"
+                width="100"
+                height="100"
+              >
+            {% endif %}
+          </div>
+          <div class="mb-3">
+            <label for="profileUsername" class="form-label">Имя пользователя</label>
+            <input type="text" class="form-control" name="username" id="profileUsername" value="{{ request.user.username }}" required>
+          </div>
+          <div class="mb-3">
+            <label for="profileAvatar" class="form-label">Сменить аватар</label>
+            <input type="file" class="form-control" name="avatar" id="profileAvatar" accept="image/png,image/jpeg">
+          </div>
+        </div>
+        <div class="modal-footer d-flex justify-content-between">
+          <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">Удалить аккаунт</button>
+          <button type="submit" class="btn btn-success">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка смены пароля -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-2">
+      <form id="changePasswordForm" method="post" action="{% url 'change_password' %}">
+        {% csrf_token %}
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title fw-bold" id="changePasswordModalLabel">Сменить пароль</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="passwordError" class="alert alert-danger d-none"></div>
+          <div class="mb-3 row align-items-center">
+            <label for="oldPassword" class="col-4 col-form-label">Старый пароль</label>
+            <div class="col-8">
+              <input type="password" class="form-control" id="oldPassword" name="old_password" required>
+            </div>
+          </div>
+          <div class="mb-3 row align-items-center">
+            <label for="newPassword" class="col-4 col-form-label">Новый пароль</label>
+            <div class="col-8">
+              <input type="password" class="form-control" id="newPassword" name="new_password" required>
+            </div>
+          </div>
+          <div class="mb-3 row align-items-center">
+            <label for="confirmPassword" class="col-4 col-form-label">Повторите пароль</label>
+            <div class="col-8">
+              <input type="password" class="form-control" id="confirmPassword" name="confirm_password" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top-0">
+          <button type="submit" class="btn btn-success px-4">Изменить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка удаления аккаунта -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form action="{% url 'delete_account' %}" method="POST">
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteAccountModalLabel">Удалить аккаунт</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p>Вы уверены, что хотите удалить аккаунт? Это действие необратимо!</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-danger">Удалить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,243 @@
+{% load static %}
+
+<!-- ===== Поиск & Добавление (flex-контейнер) ===== -->
+<form id="transactionsSearchForm" class="d-flex align-items-center mb-4" autocomplete="off">
+  <div class="input-group search-input" style="max-width:420px;">
+    <span class="input-group-text bg-white border-end-0">
+      <i class="bi bi-search text-muted"></i>
+    </span>
+    <input
+      type="search"
+      id="transactionsSearchInput"
+      name="q"
+      value="{{ q|default:'' }}"
+      class="form-control border-start-0"
+      placeholder="Поиск по товару, категории, типу…"
+      autocapitalize="off"
+      autocomplete="off"
+      spellcheck="false"
+    />
+  </div>
+  <button
+    type="button"
+    id="clearSearchBtn"
+    class="btn btn-gradient-clear ms-2"
+    style="display:none;"
+    title="Очистить поиск"
+  >
+    <i class="bi bi-x-lg"></i>
+  </button>
+  <button type="submit" class="btn btn-gradient ms-2">Найти</button>
+</form>
+
+<!-- ===== Таблица транзакций ===== -->
+<div class="table-responsive mb-4">
+  <table
+    id="transactionsTable"
+    class="table table-hover align-middle shadow-sm bg-white rounded-3"
+  >
+    <thead class="table-light">
+      <tr>
+        <th style="width:5%;">ID</th>
+        <th>Товар</th>
+        <th>Категория</th>
+        <th>Тип</th>
+        <th style="width:10%;">Кол-во</th>
+        <th>Общая цена</th>
+        <th>Дата</th>
+        <th style="width:12%; text-align:center;">Действия</th>
+      </tr>
+    </thead>
+    <tbody id="transactionsRows">
+      {% include "partials/_transactions_rows.html" %}
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== Кнопка "Добавить транзакцию" ===== -->
+<div class="d-flex justify-content-end mb-4">
+  <button
+    type="button"
+    class="btn btn-gradient"
+    data-bs-toggle="modal"
+    data-bs-target="#addTransactionModal"
+  >
+    <i class="bi bi-plus-circle"></i> Добавить транзакцию
+  </button>
+</div>
+
+<!-- ===== Модалка "Добавить транзакцию" ===== -->
+<div class="modal fade" id="addTransactionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="addTransactionForm" action="{% url 'add_transaction' %}" method="post" novalidate>
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title">Добавить транзакцию</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          {# здесь будет сообщение об ошибке нехватки товара #}
+          <div id="addTxError" class="alert alert-danger d-none mb-3"></div>
+
+          <div class="mb-3">
+            <label class="form-label" for="addTransactionItem">Товар</label>
+            <select id="addTransactionItem" name="item_id" class="form-select" required>
+              {% for item in products %}
+                <option value="{{ item.id }}" data-stock="{{ item.quantity }}">
+                  {{ item.name }} (в наличии: {{ item.quantity }})
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="addTransactionType">Тип</label>
+            <select id="addTransactionType" name="type" class="form-select" required>
+              <option value="sale">Продажа</option>
+              <option value="incoming">Поступление</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="addTransactionQty">Количество</label>
+            <input
+              id="addTransactionQty"
+              name="quantity"
+              type="number"
+              class="form-control"
+              min="1"
+              required
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-gradient">Добавить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Модалка "Редактировать транзакцию" ===== -->
+<div class="modal fade" id="editTransactionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form id="editTransactionForm" action="{% url 'edit_transaction' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" id="editTransactionId" name="id">
+        <div class="modal-header">
+          <h5 class="modal-title">Редактировать транзакцию</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label" for="editTransactionItem">Товар</label>
+            <select id="editTransactionItem" name="item_id" class="form-select" required>
+              {% for item in products %}
+                <option value="{{ item.id }}">{{ item.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="editTransactionType">Тип</label>
+            <select id="editTransactionType" name="type" class="form-select" required>
+              <option value="sale">Продажа</option>
+              <option value="incoming">Поступление</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="editTransactionQty">Количество</label>
+            <input id="editTransactionQty" name="quantity" type="number" class="form-control" min="1" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-gradient">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ===== JS: Live Search + Toolbar + Validation ===== -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // —— Поиск + toolbar (оставляем без изменений) ——
+  const input = document.getElementById('transactionsSearchInput');
+  const clearBtn = document.getElementById('clearSearchBtn');
+  let timer;
+  const toggleClear = () => { clearBtn.style.display = input.value ? 'inline-flex' : 'none'; };
+  toggleClear();
+  input.addEventListener('input', () => {
+    toggleClear();
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const url = new URL(window.location.href);
+      url.searchParams.set('q', input.value);
+      fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+        .then(r => r.text())
+        .then(html => {
+          document.getElementById('transactionsRows').innerHTML = html;
+          initRowToolbar();
+        });
+    }, 300);
+  });
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    input.dispatchEvent(new Event('input'));
+    input.focus();
+  });
+  window.initRowToolbar = () => {
+    document.querySelectorAll('.table-row-with-toolbar').forEach(row => {
+      const tb = row.querySelector('.action-toolbar');
+      row.onmouseenter = () => { tb.style.opacity = '1'; tb.style.pointerEvents = 'auto'; };
+      row.onmouseleave = () => { tb.style.opacity = '0'; tb.style.pointerEvents = 'none'; };
+    });
+  };
+  initRowToolbar();
+
+  // —— Валидация формы добавления транзакции ——
+  const addForm       = document.getElementById('addTransactionForm');
+  const addItem       = document.getElementById('addTransactionItem');
+  const addType       = document.getElementById('addTransactionType');
+  const addQty        = document.getElementById('addTransactionQty');
+  const addErrorDiv   = document.getElementById('addTxError');
+
+  addForm.addEventListener('submit', e => {
+    // проверяем только для продажи
+    if ( addType.value === 'sale' ) {
+      const stock = parseInt(addItem.selectedOptions[0].dataset.stock, 10) || 0;
+      const qty   = parseInt(addQty.value, 10) || 0;
+      if (qty > stock) {
+        e.preventDefault();
+        addErrorDiv.textContent = `В наличии только ${stock} шт., продать ${qty} нельзя.`;
+        addErrorDiv.classList.remove('d-none');
+        return;
+      }
+    }
+    // скрываем ранее показанное сообщение
+    addErrorDiv.classList.add('d-none');
+  });
+
+  // При смене товара или количества — прячем ошибку
+  addItem.addEventListener('change', () => addErrorDiv.classList.add('d-none'));
+  addQty .addEventListener('input', () => addErrorDiv.classList.add('d-none'));
+});
+</script>
+
+<!-- ===== Локальные стили для поиска ===== -->
+<style>
+.search-input .form-control { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.search-input .input-group-text { border-top-left-radius: .5rem; border-bottom-left-radius: .5rem; }
+.btn-gradient-clear {
+  width: 3rem; height: 3rem; padding: 0; border-radius: 50%;
+  background: linear-gradient(90deg,#726bff 10%,#e14bff 100%);
+  box-shadow: var(--shadow-glow); color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  transition: transform .2s, box-shadow .3s;
+}
+.btn-gradient-clear:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 0 0 5px #b8a0fc33,0 16px 36px 0 #a780fa35;
+}
+</style>

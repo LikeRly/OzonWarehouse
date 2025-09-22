@@ -1,0 +1,261 @@
+{% load static %}
+{% load widget_tweaks %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Вход | OzonСклад</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        html, body {
+            min-height: 100vh;
+            height: 100%;
+            margin: 0;
+            background: radial-gradient(ellipse at 50% 10%, #fafdff 0%, #e7eefc 80%, #e2e7f1 100%);
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #1e2233;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 370px;
+            background: #fff;
+            border-radius: 2.1rem;
+            box-shadow: 0 12px 40px 0 rgba(44,54,100,0.14), 0 2px 8px 0 rgba(44,54,100,0.06);
+            padding: 2.2rem 2.1rem 1.2rem 2.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeInUp .48s cubic-bezier(.43,.28,.24,1.19);
+        }
+        @keyframes fadeInUp {
+            from { transform: translateY(32px) scale(0.97); opacity: 0; }
+            to   { transform: translateY(0) scale(1); opacity: 1; }
+        }
+        @keyframes shake {
+            10%, 90% { transform: translateX(-2px); }
+            20%, 80% { transform: translateX(4px); }
+            30%, 50%, 70% { transform: translateX(-8px); }
+            40%, 60% { transform: translateX(8px); }
+        }
+        .logo {
+            font-size: 2.4rem;
+            color: #2640a4;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 2px 8px #d4dffc30);
+        }
+        .title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            margin-bottom: .15rem;
+            text-align: center;
+        }
+        .subtitle {
+            font-size: 1.13rem;
+            font-weight: 700;
+            margin-bottom: 1.13rem;
+            text-align: center;
+            letter-spacing: 0.03em;
+        }
+        .subtitle .ozon {
+            color: #FFD600;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-shadow: 0 2px 7px #fff6b6b6;
+        }
+        .subtitle .sklad {
+            color: #213160;
+            font-weight: 800;
+            letter-spacing: 0.01em;
+            margin-left: 0.1em;
+        }
+        form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 7px;
+            margin-bottom: 8px;
+        }
+        .input-group {
+            position: relative;
+            width: 100%;
+        }
+        .input-group input {
+            width: 100%;
+            border-radius: 1.1rem;
+            padding: .81rem 2.6rem .81rem 2.3rem;
+            border: 1.3px solid #e4e8f2;
+            background: #f8faff;
+            color: #23253a;
+            font-size: 1.02rem;
+            font-weight: 500;
+            transition: border-color .16s, box-shadow .17s;
+            outline: none;
+        }
+        .input-group input:focus {
+            border-color: #2640a4;
+            background: #fbfcff;
+            box-shadow: 0 2px 11px 0 rgba(33,49,96,0.07);
+        }
+        .input-group .input-icon {
+            position: absolute;
+            top: 50%;
+            left: 1rem;
+            transform: translateY(-50%);
+            font-size: 1.18rem;
+            color: #b1b8c6;
+            pointer-events: none;
+            transition: color .18s;
+        }
+        .input-group .toggle-password {
+            position: absolute;
+            right: 0.95rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #b1b8c6;
+            cursor: pointer;
+            font-size: 1.15rem;
+            z-index: 2;
+            transition: color .14s;
+        }
+        .input-group .toggle-password:hover {
+            color: #FFD600;
+        }
+        .input-group:focus-within .input-icon {
+            color: #2640a4;
+        }
+        .input-label {
+            font-size: 1.01rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+            margin-left: 2px;
+            color: #23305b;
+        }
+        .form-text { font-size: .97em; min-height: 16px;}
+        .text-danger { color: #e53939 !important; font-weight: 500;}
+        .btn-gradient {
+            margin-top: 11px;
+            width: 100%;
+            font-size: 1.13rem;
+            padding: .81rem 0;
+            border-radius: 2.2rem !important;
+            background: linear-gradient(90deg, #213160 0%, #FFD600 100%);
+            border: none;
+            color: #fff;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            box-shadow: 0 2px 14px 0 #FFD60033, 0 1px 4px #21316019;
+            transition: filter .18s, transform .16s;
+            cursor: pointer;
+        }
+        .btn-gradient:hover {
+            filter: brightness(1.09) drop-shadow(0 3px 10px #FFD60050);
+            transform: translateY(-2px) scale(1.022);
+        }
+        .bottom-text {
+            margin-top: 19px;
+            text-align: center;
+            color: #adb7cd;
+            font-size: 0.98rem;
+        }
+        .bottom-text a {
+            color: #2640a4;
+            font-weight: 600;
+            text-decoration: none;
+            margin-left: 4px;
+            transition: color .15s;
+        }
+        .bottom-text a:hover { color: #FFD600; }
+        .input-group input::placeholder {
+            color: #b1b8c6;
+            opacity: 1;
+            font-weight: 400;
+        }
+        @media (max-width: 540px) {
+            .login-card { padding: 1.1rem 0.3rem 1rem 0.3rem;}
+            .logo { font-size: 1.7rem;}
+        }
+    </style>
+</head>
+<body>
+<div class="login-card {% if form.errors or form.non_field_errors %}shake{% endif %}">
+    <div class="logo"><i class="bi bi-person-circle"></i></div>
+    <div class="title">Вход</div>
+    <div class="subtitle">
+        в <span class="ozon">Ozon</span><span class="sklad">Склад</span>
+    </div>
+    <form method="post" autocomplete="off" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div>
+            <label class="input-label" for="{{ form.username.id_for_label }}">Логин</label>
+            <div class="input-group">
+                <span class="input-icon"><i class="bi bi-person"></i></span>
+                {{ form.username|add_class:"form-control" }}
+            </div>
+            <div class="form-text text-danger">
+                {% for error in form.username.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <label class="input-label" for="{{ form.password.id_for_label }}">Пароль</label>
+            <div class="input-group">
+                <span class="input-icon"><i class="bi bi-lock"></i></span>
+                {{ form.password|add_class:"form-control" }}
+                <span class="toggle-password" onclick="togglePassword(this)">
+                    <i class="bi bi-eye" id="eye-icon"></i>
+                </span>
+            </div>
+            <div class="form-text text-danger">
+                {% for error in form.password.errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        </div>
+        <button type="submit" class="btn-gradient">Войти</button>
+    </form>
+    <div class="bottom-text">
+        Нет аккаунта?
+        <a href="{% url 'register' %}">Зарегистрироваться</a>
+    </div>
+</div>
+<script>
+    // Добавить плейсхолдеры (если их нет по умолчанию)
+    document.addEventListener('DOMContentLoaded', function() {
+        let username = document.querySelector('input[name="username"]');
+        let password = document.querySelector('input[name="password"]');
+        if (username) username.placeholder = "Введите логин";
+        if (password) password.placeholder = "Введите пароль";
+    });
+
+    // Показать/скрыть пароль
+    function togglePassword(elem) {
+        let pwd = elem.parentElement.querySelector('input');
+        let icon = elem.querySelector('i');
+        if (pwd.type === "password") {
+            pwd.type = "text";
+            icon.classList.remove("bi-eye");
+            icon.classList.add("bi-eye-slash");
+        } else {
+            pwd.type = "password";
+            icon.classList.add("bi-eye");
+            icon.classList.remove("bi-eye-slash");
+        }
+    }
+</script>
+</body>
+</html>

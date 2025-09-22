@@ -1,0 +1,112 @@
+{# templates/partials/_transactions_rows.html #}
+{% comment %}
+  Этот partial рендерит только набор <tr>…</tr> и подставляется в
+  <tbody id="transactionsRows"> при загрузке и AJAX-поиске.
+{% endcomment %}
+
+{% if transactions %}
+  {% for tx in transactions %}
+    <tr>
+      <!-- ID -->
+      <td class="fw-semibold text-secondary">{{ tx.id }}</td>
+
+      <!-- Название товара -->
+      <td>{{ tx.item_name }}</td>
+
+      <!-- Категория -->
+      <td>
+        <span class="badge bg-primary-subtle">
+          {{ tx.category|default:"–" }}
+        </span>
+      </td>
+
+      <!-- Тип -->
+      <td>
+        {% if tx.type == 'sale' %}
+          <span class="badge bg-success">Продажа</span>
+        {% elif tx.type == 'incoming' %}
+          <span class="badge bg-info text-dark">Поступление</span>
+        {% else %}
+          <span class="badge bg-secondary">Другое</span>
+        {% endif %}
+      </td>
+
+      <!-- Количество -->
+      <td>{{ tx.quantity }}</td>
+
+      <!-- Общая цена -->
+      <td>{{ tx.total_price|floatformat:2 }}</td>
+
+      <!-- Дата -->
+      <td><small class="text-muted">{{ tx.date|date:"d.m.Y H:i" }}</small></td>
+
+      <!-- Действия -->
+      <td>
+        <div class="d-flex gap-2 justify-content-center">
+          <!-- Редактировать -->
+          <button
+            type="button"
+            class="btn btn-gradient-edit btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#editTransactionModal"
+            data-id="{{ tx.id }}"
+            data-item="{{ tx.product.id }}"
+            data-type="{{ tx.type }}"
+            data-qty="{{ tx.quantity }}"
+            title="Редактировать"
+          >
+            <i class="bi bi-pencil"></i>
+            <span class="d-none d-md-inline">Ред.</span>
+          </button>
+
+          <!-- Удалить -->
+          <form
+            action="{% url 'delete_transaction' tx.id %}"
+            method="post"
+            onsubmit="return confirm('Удалить транзакцию №{{ tx.id }}?');"
+          >
+            {% csrf_token %}
+            <button
+              type="submit"
+              class="btn btn-gradient-danger btn-sm"
+              title="Удалить"
+            >
+              <i class="bi bi-trash"></i>
+              <span class="d-none d-md-inline">Удалить</span>
+            </button>
+          </form>
+        </div>
+      </td>
+    </tr>
+  {% endfor %}
+
+{% else %}
+  {% if q %}
+    <tr>
+      <td colspan="8" class="text-center text-muted py-4">
+        Нет совпадений по запросу <b>"{{ q }}"</b>
+      </td>
+    </tr>
+  {% else %}
+    {# Плейсхолдеры при отсутствии данных #}
+    {% for _ in "1234" %}
+      <tr>
+        {% for __ in "12345678" %}
+          <td>
+            <div class="skeleton skeleton-text" style="width:90%; height:20px;"></div>
+          </td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    <tr>
+      <td colspan="8" class="text-center text-muted py-4">
+        Нет транзакций —
+        <span class="fw-bold text-primary" style="cursor:pointer;"
+              data-bs-toggle="modal"
+              data-bs-target="#addTransactionModal">
+          добавить первую!
+        </span>
+      </td>
+    </tr>
+  {% endif %}
+{% endif %}

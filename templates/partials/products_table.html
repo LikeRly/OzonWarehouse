@@ -1,0 +1,232 @@
+{% load static tz %}
+{# templates/partials/products_table.html #}
+
+<div class="table-responsive mb-4">
+  <table
+    id="productsTable"
+    class="table table-hover align-middle shadow-sm bg-white rounded-3"
+  >
+    <thead class="table-light">
+      <tr>
+        <th style="width:5%;">ID</th>
+        <th>Название</th>
+        <th style="width:13%;">Категория</th>
+        <th style="width:12%;">Кол-во</th>
+        <th style="width:12%;">Цена, ₽</th>
+        <th style="width:17%;">Дата добавления</th>
+        <th style="width:5%;">Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in products %}
+        <tr>
+          <td class="fw-semibold text-secondary">{{ item.id }}</td>
+          <td>
+            <span
+              data-bs-toggle="tooltip"
+              title="Просмотреть детали"
+              style="cursor:pointer;"
+              data-id="{{ item.id }}"
+              class="product-row-link"
+            >
+              {{ item.name }}
+            </span>
+          </td>
+          <td>
+            {% if item.category %}
+              {{ item.category }}
+            {% else %}
+              <span class="text-muted">Без категории</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="text-success fw-bold">{{ item.quantity }}</span>
+            {% if item.quantity < 5 %}
+              <span class="badge bg-danger ms-1">Мало</span>
+            {% endif %}
+          </td>
+          <td>{{ item.price|floatformat:2 }}</td>
+          <td>
+            <small class="text-muted">
+              {% timezone "Europe/Moscow" %}
+                {{ item.date_added|date:"d.m.Y H:i" }}
+              {% endtimezone %}
+            </small>
+          </td>
+          <td>
+            <div class="d-flex gap-2 justify-content-center">
+              <!-- Редактировать -->
+              <button
+                type="button"
+                class="btn btn-gradient-edit btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#editProductModal"
+                data-id="{{ item.id }}"
+                data-name="{{ item.name }}"
+                data-category="{{ item.category|default:'' }}"
+                data-quantity="{{ item.quantity }}"
+                data-price="{{ item.price }}"
+                title="Редактировать товар"
+              >
+                <i class="bi bi-pencil"></i>
+              </button>
+              <!-- Удалить -->
+              <form
+                action="{% url 'delete_product' item.id %}"
+                method="post"
+                class="d-inline"
+                onsubmit="return confirm('Удалить товар «{{ item.name }}»?');"
+              >
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  class="btn btn-gradient-danger btn-sm"
+                  title="Удалить товар"
+                >
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr>
+          <td colspan="7" class="text-center text-muted py-4">
+            Товары отсутствуют
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="d-flex justify-content-end mb-3">
+  <button
+    class="btn btn-gradient"
+    data-bs-toggle="modal"
+    data-bs-target="#addProductModal"
+  >
+    <i class="bi bi-plus-circle"></i> Редактировать
+  </button>
+</div>
+
+{# ——— Модалка "Добавить товар" ——— #}
+<div
+  class="modal fade"
+  id="addProductModal"
+  tabindex="-1"
+  aria-labelledby="addProductModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form
+        id="addProductForm"
+        action="{% url 'add_product' %}"
+        method="post"
+        novalidate
+      >
+        {% csrf_token %}
+        <div class="modal-header">
+          <h5 class="modal-title" id="addProductModalLabel">Добавить товар</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="addName" class="form-label">Название</label>
+            <input type="text" class="form-control" id="addName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="addCategory" class="form-label">Категория</label>
+            <input type="text" class="form-control" id="addCategory" name="category">
+          </div>
+          <div class="mb-3">
+            <label for="addQuantity" class="form-label">Количество</label>
+            <input type="number" class="form-control" id="addQuantity" name="quantity" min="0" value="0" required>
+          </div>
+          <div class="mb-3">
+            <label for="addPrice" class="form-label">Цена, ₽</label>
+            <input type="number" class="form-control" id="addPrice" name="price" step="0.01" min="0" value="0.00" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-gradient">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{# ——— Модалка "Редактировать товар" ——— #}
+<div
+  class="modal fade"
+  id="editProductModal"
+  tabindex="-1"
+  aria-labelledby="editProductModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <form
+        id="editProductForm"
+        action="{% url 'edit_product' %}"
+        method="post"
+        novalidate
+      >
+        {% csrf_token %}
+        <input type="hidden" name="id" id="editProductId">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editProductModalLabel">Редактировать товар</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="editProductName" class="form-label">Название</label>
+            <input type="text" class="form-control" id="editProductName" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="editProductCategory" class="form-label">Категория</label>
+            <input type="text" class="form-control" id="editProductCategory" name="category">
+          </div>
+          <div class="mb-3">
+            <label for="editProductQuantity" class="form-label">Количество</label>
+            <input type="number" class="form-control" id="editProductQuantity" name="quantity" min="0" required>
+          </div>
+          <div class="mb-3">
+            <label for="editProductPrice" class="form-label">Цена, ₽</label>
+            <input type="number" class="form-control" id="editProductPrice" name="price" step="0.01" min="0" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+          <button type="submit" class="btn btn-gradient">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Подстановка данных в форму редактирования
+  const editProductModal = document.getElementById('editProductModal');
+  editProductModal.addEventListener('show.bs.modal', function(event) {
+    const btn       = event.relatedTarget;
+    const id        = btn.getAttribute('data-id');
+    const name      = btn.getAttribute('data-name');
+    const category  = btn.getAttribute('data-category');
+    const quantity  = btn.getAttribute('data-quantity');
+    const price     = btn.getAttribute('data-price');
+
+    document.getElementById('editProductId').value       = id;
+    document.getElementById('editProductName').value     = name;
+    document.getElementById('editProductCategory').value = category;
+    document.getElementById('editProductQuantity').value = quantity;
+    document.getElementById('editProductPrice').value    = price;
+  });
+
+  // Инициализация тултипов (Bootstrap)
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el =>
+    new bootstrap.Tooltip(el)
+  );
+</script>

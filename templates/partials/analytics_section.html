@@ -1,0 +1,160 @@
+{# templates/partials/analytics_section.html #}
+{% load static %}
+
+<div id="section-analytics" class="spa-section">
+
+  {# ===== ФИЛЬТР ПО ДАТАМ ===== #}
+  <div class="card mb-4 shadow-sm border-0">
+    <div class="card-body">
+      <form
+        id="analyticsFilterForm"
+        class="row g-3 align-items-center"
+        method="get"
+        action="{% url 'analytics' %}"
+      >
+        <div class="col-auto">
+          <label for="filter-from" class="form-label visually-hidden">С</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light"><i class="bi bi-calendar-date text-primary"></i></span>
+            <input
+              type="date"
+              id="filter-from"
+              name="date_from"
+              class="form-control"
+              {% if analytics.date_from %} value="{{ analytics.date_from }}" {% endif %}
+            >
+          </div>
+        </div>
+        <div class="col-auto">
+          <label for="filter-to" class="form-label visually-hidden">По</label>
+          <div class="input-group">
+            <span class="input-group-text bg-light"><i class="bi bi-calendar-date text-primary"></i></span>
+            <input
+              type="date"
+              id="filter-to"
+              name="date_to"
+              class="form-control"
+              {% if analytics.date_to %} value="{{ analytics.date_to }}" {% endif %}
+            >
+          </div>
+        </div>
+        <div class="col-auto d-grid">
+          <button
+            type="submit"
+            class="btn btn-gradient px-4 py-2"
+            style="font-weight:600;"
+          >
+            <i class="bi bi-filter-circle me-1"></i> Показать
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    {# ===== ГРАФИК ПРОДАЖ ===== #}
+    <div class="col-lg-8">
+      <div class="card h-100 shadow-sm border-0" style="border-left:4px solid #0d6efd;">
+        <div class="card-body">
+          <div class="d-flex align-items-center mb-3">
+            <i class="bi bi-graph-up text-primary fs-4 me-2"></i>
+            <h5 class="mb-0 text-primary fw-bold">Аналитика продаж по дням</h5>
+          </div>
+          <canvas id="salesChart" style="max-height:320px; width:100%;"></canvas>
+          <p class="text-muted small mt-2 mb-0">
+            {% if analytics.date_from and analytics.date_to %}
+              Показаны продажи с {{ analytics.date_from }} по {{ analytics.date_to }}.
+            {% else %}
+              Показаны продажи за последние 30 дней.
+            {% endif %}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    {# ===== БОКОВАЯ ПАНЕЛЬ ===== #}
+    <div class="col-lg-4">
+      <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body">
+          <h6 class="text-secondary mb-2">Топ-5 товаров по продажам</h6>
+          <ol class="ps-3 mb-0">
+            {% if analytics.top_5_products %}
+              {% for p in analytics.top_5_products %}
+                <li>{{ p.name }} — <strong>{{ p.sold }} шт.</strong></li>
+              {% endfor %}
+            {% else %}
+              <li class="text-muted">Нет данных</li>
+            {% endif %}
+          </ol>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0 mb-3">
+        <div class="card-body">
+          <h6 class="text-secondary mb-1">Сумма продаж за период</h6>
+          <div class="h4 fw-bold">
+            {{ analytics.period_total|default:0 }} ₽
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-body">
+          <h6 class="text-secondary mb-1">Средний чек</h6>
+          <div class="h4 fw-bold">
+            {{ analytics.avg_check|default:0 }} ₽
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{# ===== Chart.js ===== #}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const canvas = document.getElementById('salesChart');
+  if (!canvas) return;
+
+  const labels = {{ analytics.sales_chart_labels|default:"[]"|safe }};
+  const data   = {{ analytics.sales_chart_data  |default:"[]"|safe }};
+
+  const ctx = canvas.getContext('2d');
+  if (window.salesChart && typeof window.salesChart.destroy === 'function') {
+    window.salesChart.destroy();
+  }
+
+  window.salesChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets: [{
+      label: '₽',
+      data,
+      tension: 0.3,
+      fill: true,
+      borderColor: '#0d6efd',
+      backgroundColor: 'rgba(13,110,253,0.1)',
+      pointRadius: 4,
+      pointBackgroundColor: '#fff',
+      pointBorderColor: '#0d6efd',
+      borderWidth: 2
+    }]},
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.parsed.y} ₽`
+          }
+        }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: '#eef2f7' } },
+        x: { grid: { color: '#eef2f7' }, ticks: { maxTicksLimit: 12 } }
+      }
+    }
+  });
+});
+</script>

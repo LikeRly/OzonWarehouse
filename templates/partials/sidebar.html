@@ -1,0 +1,37 @@
+{% load static %}
+
+<aside class="sidebar bg-light border-end vh-100 d-flex flex-column">
+  <!-- Логотип / заголовок -->
+  <div class="sidebar-header text-center py-4">
+    <a href="{% url 'index' %}" class="navbar-brand fs-4">
+      Ozon<span class="text-primary">Склад</span>
+      <span class="theme-toggle ms-2" id="toggleNightMode" title="Сменить тему" style="cursor:pointer;">
+        <i class="bi bi-moon" id="themeIcon"></i>
+      </span>
+    </a>
+  </div>
+  <!-- Навигация -->
+  <nav class="nav flex-column px-3">
+    <a
+      class="nav-link d-flex align-items-center mb-2 {% if request.resolver_match.url_name == 'index' %}active{% endif %}"
+      href="{% url 'index' %}"
+    >
+      <i class="bi bi-box-seam me-2"></i>
+      Товары
+    </a>
+    <a
+      class="nav-link d-flex align-items-center mb-2 {% if request.resolver_match.url_name == 'transactions' %}active{% endif %}"
+      href="{% url 'transactions' %}"
+    >
+      <i class="bi bi-currency-exchange me-2"></i>
+      Транзакции
+    </a>
+    <a
+      class="nav-link d-flex align-items-center mb-2 {% if request.resolver_match.url_name == 'analytics' %}active{% endif %}"
+      href="{% url 'analytics' %}"
+    >
+      <i class="bi bi-bar-chart-line me-2"></i>
+      Аналитика
+    </a>
+  </nav>
+</aside>
